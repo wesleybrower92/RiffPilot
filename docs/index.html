@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riff Pilot &mdash; Your All-in-One Desktop Music Toolkit</title>
+    <meta name="description" content="Download, split, analyze, and practice music — all from your desktop. Free for Windows.">
+    <meta property="og:title" content="Riff Pilot — Desktop Music Toolkit">
+    <meta property="og:description" content="11 tools for guitar players and producers. Download for free.">
+    <meta property="og:image" content="Logo.png">
+    <link rel="icon" href="Logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --bg-card: #141414;
+            --bg-card-hover: #1a1a1a;
+            --border: #222222;
+            --purple: #7c3aed;
+            --purple-hover: #6d28d9;
+            --purple-dark: #5b21b6;
+            --purple-glow: rgba(124, 58, 237, 0.15);
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+            --text-muted: #666666;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero > * { position: relative; z-index: 1; }
+
+        .hero-logo {
+            width: 220px;
+            height: auto;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 40px rgba(124, 58, 237, 0.3));
+        }
+
+        .hero h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .hero h1 span { color: var(--purple); }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-secondary);
+            max-width: 540px;
+            margin-bottom: 2rem;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--purple);
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem 2.5rem;
+            border-radius: 14px;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 24px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-download:hover {
+            background: var(--purple-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(124, 58, 237, 0.45);
+        }
+
+        .btn-download:active {
+            background: var(--purple-dark);
+            transform: translateY(0);
+        }
+
+        .btn-download svg { width: 20px; height: 20px; fill: currentColor; }
+
+        .hero-meta {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* ── Section Layout ── */
+        section { padding: 5rem 2rem; }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 3rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* ── Feature Cards ── */
+        .features-group { margin-bottom: 4rem; }
+
+        .features-group:last-child { margin-bottom: 0; }
+
+        .group-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            justify-items: center;
+        }
+
+        .card-grid-3 {
+            grid-template-columns: repeat(3, minmax(220px, 1fr));
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.75rem 1.5rem;
+            text-align: center;
+            width: 100%;
+            transition: border-color 0.25s, background 0.25s, transform 0.25s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .card.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: border-color 0.25s, background 0.25s, transform 0.25s,
+                        opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .card:hover {
+            border-color: var(--purple);
+            background: var(--bg-card-hover);
+            transform: translateY(-4px);
+        }
+
+        .card-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── CTA Section ── */
+        .cta {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.12) 0%, rgba(91, 33, 182, 0.06) 100%);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cta h2 {
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+        }
+
+        .cta p {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* ── Footer ── */
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--purple);
+            text-decoration: none;
+        }
+
+        footer a:hover { text-decoration: underline; }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .card-grid, .card-grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .hero-logo { width: 160px; }
+            section { padding: 3rem 1.25rem; }
+        }
+
+        @media (max-width: 480px) {
+            .card-grid, .card-grid-3 {
+                grid-template-columns: 1fr;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <section class="hero">
+        <img src="Logo.png" alt="Riff Pilot" class="hero-logo">
+        <h1>Your all-in-one <span>music toolkit</span></h1>
+        <p>Download, split, analyze, and practice music &mdash; all from your desktop. 11 tools built for guitar players and producers.</p>
+        <a href="https://github.com/wesleybrower92/RiffPilot/releases/latest/download/RiffPilot_Setup_1.0.0.exe" class="btn-download">
+            <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 4h16v-2H4v2z"/></svg>
+            Download for Windows
+        </a>
+        <p class="hero-meta">Free &middot; Windows 10/11 (64-bit)</p>
+        <div class="scroll-hint">&darr;</div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+        <div class="container">
+            <p class="section-label">Everything you need</p>
+            <h2 class="section-title">Powerful tools, one app</h2>
+
+            <!-- Production Tools -->
+            <div class="features-group">
+                <p class="group-title">Production Tools</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <span class="card-icon">&#x2B07;</span>
+                        <h3>YT Download</h3>
+                        <p>Download audio from YouTube in WAV, MP3 or FLAC format</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x266B;</span>
+                        <h3>Stem Splitter</h3>
+                        <p>Separate vocals, drums, bass &amp; instrumentals with AI</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x266A;</span>
+                        <h3>Key &amp; BPM</h3>
+                        <p>Detect musical key, tempo &amp; Camelot code instantly</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x21C4;</span>
+                        <h3>Audio Converter</h3>
+                        <p>Convert between audio formats with custom bitrate &amp; sample rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Tools -->
+            <div class="features-group">
+                <p class="group-title">Practice Tools</p>
+                <div class="card-grid">
+                    <div class="card">
+                        <span class="card-icon">&#x25B6;</span>
+                        <h3>Practice Player</h3>
+                        <p>Slow down tracks with pitch preserved for practicing riffs</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x23F2;</span>
+                        <h3>Metronome</h3>
+                        <p>Tap tempo, auto-detect BPM &amp; keep time while playing</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x266F;</span>
+                        <h3>Guitar Tuner</h3>
+                        <p>Tune your guitar with real-time pitch detection from your mic</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x1D11E;</span>
+                        <h3>Guitar Tabs</h3>
+                        <p>Search for guitar tabs &amp; chords from popular tab sites</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fretboard & Theory -->
+            <div class="features-group">
+                <p class="group-title">Fretboard &amp; Theory</p>
+                <div class="card-grid card-grid-3">
+                    <div class="card">
+                        <span class="card-icon">&#x1F3BC;</span>
+                        <h3>Notes &amp; Scales</h3>
+                        <p>Full fretboard visualization with 12+ tunings &amp; scale highlights</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x1F3B8;</span>
+                        <h3>CAGED Chords</h3>
+                        <p>View all five CAGED voicings for any chord on guitar</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">&#x1F3B5;</span>
+                        <h3>Chord Library</h3>
+                        <p>Every playable voicing for any chord in any tuning with audio preview</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <h2>Ready to jam?</h2>
+        <p>Download Riff Pilot and start making music today.</p>
+        <a href="https://github.com/wesleybrower92/RiffPilot/releases/latest/download/RiffPilot_Setup_1.0.0.exe" class="btn-download">
+            <svg viewBox="0 0 24 24"><path d="M12 16l-6-6h4V4h4v6h4l-6 6zm-8 4h16v-2H4v2z"/></svg>
+            Download for Windows
+        </a>
+        <p class="hero-meta" style="margin-top: 1rem;">
+            <a href="https://github.com/wesleybrower92/RiffPilot/releases" style="color: var(--text-muted);">View all releases on GitHub &rarr;</a>
+        </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Built with passion for musicians &middot; <a href="https://github.com/wesleybrower92/RiffPilot">GitHub</a></p>
+        <p style="margin-top: 0.5rem;">&copy; 2026 GAB Consultancy. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Fade-in cards on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    const idx = [...entry.target.parentElement.children].indexOf(entry.target);
+                    setTimeout(() => entry.target.classList.add('visible'), idx * 80);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.card').forEach(card => observer.observe(card));
+
+        // Hide scroll hint after scrolling
+        window.addEventListener('scroll', () => {
+            const hint = document.querySelector('.scroll-hint');
+            if (hint && window.scrollY > 100) hint.style.opacity = '0';
+        }, { passive: true });
+    </script>
+</body>
+</html>
