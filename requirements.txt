@@ -1,0 +1,11 @@
+PySide6>=6.5
+numpy
+scipy
+librosa
+sounddevice
+soundfile
+soxr
+numba
+yt-dlp
+demucs
+scikit-learn

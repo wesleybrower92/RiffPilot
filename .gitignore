@@ -6,4 +6,3 @@ installer_output/
 *.spec.bak
 wizard_image.bmp
 wizard_small.bmp
-app_icon.ico

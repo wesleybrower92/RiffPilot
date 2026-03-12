@@ -1,0 +1,66 @@
+name: Build macOS DMG
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pyinstaller
+          pip install -r requirements.txt
+
+      - name: Convert icon to icns
+        run: |
+          if [ -f "app_icon.ico" ]; then
+            mkdir -p app_icon.iconset
+            sips -z 16 16     app_icon.ico --out app_icon.iconset/icon_16x16.png      2>/dev/null || true
+            sips -z 32 32     app_icon.ico --out app_icon.iconset/icon_16x16@2x.png   2>/dev/null || true
+            sips -z 32 32     app_icon.ico --out app_icon.iconset/icon_32x32.png      2>/dev/null || true
+            sips -z 64 64     app_icon.ico --out app_icon.iconset/icon_32x32@2x.png   2>/dev/null || true
+            sips -z 128 128   app_icon.ico --out app_icon.iconset/icon_128x128.png    2>/dev/null || true
+            sips -z 256 256   app_icon.ico --out app_icon.iconset/icon_128x128@2x.png 2>/dev/null || true
+            sips -z 256 256   app_icon.ico --out app_icon.iconset/icon_256x256.png    2>/dev/null || true
+            sips -z 512 512   app_icon.ico --out app_icon.iconset/icon_256x256@2x.png 2>/dev/null || true
+            sips -z 512 512   app_icon.ico --out app_icon.iconset/icon_512x512.png    2>/dev/null || true
+            sips -z 1024 1024 app_icon.ico --out app_icon.iconset/icon_512x512@2x.png 2>/dev/null || true
+            iconutil -c icns app_icon.iconset -o app_icon.icns
+            rm -rf app_icon.iconset
+          fi
+
+      - name: Build with PyInstaller
+        run: python -m PyInstaller --clean --noconfirm RiffPilot_mac.spec
+
+      - name: Create DMG
+        run: |
+          DMG_TEMP="dist/dmg_temp"
+          mkdir -p "${DMG_TEMP}"
+          cp -R "dist/Riff Pilot.app" "${DMG_TEMP}/"
+          ln -s /Applications "${DMG_TEMP}/Applications"
+          hdiutil create -volname "Riff Pilot" \
+            -srcfolder "${DMG_TEMP}" \
+            -ov -format UDZO \
+            "dist/RiffPilot_1.0.0_macOS.dmg"
+          rm -rf "${DMG_TEMP}"
+
+      - name: Upload DMG to existing release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload v1.0.0 "dist/RiffPilot_1.0.0_macOS.dmg" --clobber
+
+      - name: Upload DMG as artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: RiffPilot_1.0.0_macOS
+          path: dist/RiffPilot_1.0.0_macOS.dmg
