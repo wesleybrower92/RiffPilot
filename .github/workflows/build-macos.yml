@@ -17,26 +17,49 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install pyinstaller
+          pip install pyinstaller Pillow
           pip install -r requirements.txt
 
       - name: Convert icon to icns
         run: |
-          if [ -f "app_icon.ico" ]; then
-            mkdir -p app_icon.iconset
-            sips -z 16 16     app_icon.ico --out app_icon.iconset/icon_16x16.png      2>/dev/null || true
-            sips -z 32 32     app_icon.ico --out app_icon.iconset/icon_16x16@2x.png   2>/dev/null || true
-            sips -z 32 32     app_icon.ico --out app_icon.iconset/icon_32x32.png      2>/dev/null || true
-            sips -z 64 64     app_icon.ico --out app_icon.iconset/icon_32x32@2x.png   2>/dev/null || true
-            sips -z 128 128   app_icon.ico --out app_icon.iconset/icon_128x128.png    2>/dev/null || true
-            sips -z 256 256   app_icon.ico --out app_icon.iconset/icon_128x128@2x.png 2>/dev/null || true
-            sips -z 256 256   app_icon.ico --out app_icon.iconset/icon_256x256.png    2>/dev/null || true
-            sips -z 512 512   app_icon.ico --out app_icon.iconset/icon_256x256@2x.png 2>/dev/null || true
-            sips -z 512 512   app_icon.ico --out app_icon.iconset/icon_512x512.png    2>/dev/null || true
-            sips -z 1024 1024 app_icon.ico --out app_icon.iconset/icon_512x512@2x.png 2>/dev/null || true
-            iconutil -c icns app_icon.iconset -o app_icon.icns
-            rm -rf app_icon.iconset
-          fi
+          python3 -c "
+          from PIL import Image
+          import os, subprocess, shutil
+
+          # Use Logo.png as source (higher res), fall back to .ico
+          src = 'Logo.png' if os.path.exists('Logo.png') else 'app_icon.ico'
+          img = Image.open(src).convert('RGBA')
+
+          iconset = 'app_icon.iconset'
+          os.makedirs(iconset, exist_ok=True)
+
+          sizes = [16, 32, 64, 128, 256, 512, 1024]
+          names = {
+              16:   'icon_16x16.png',
+              32:   'icon_16x16@2x.png',
+              64:   'icon_32x32@2x.png',
+              128:  'icon_128x128.png',
+              256:  'icon_128x128@2x.png',
+              512:  'icon_512x512.png',
+              1024: 'icon_512x512@2x.png',
+          }
+          # Also need these exact sizes
+          extra = {
+              32:  'icon_32x32.png',
+              256: 'icon_256x256.png',
+          }
+
+          for s in sizes:
+              resized = img.resize((s, s), Image.LANCZOS)
+              if s in names:
+                  resized.save(os.path.join(iconset, names[s]))
+              if s in extra:
+                  resized.save(os.path.join(iconset, extra[s]))
+
+          subprocess.run(['iconutil', '-c', 'icns', iconset, '-o', 'app_icon.icns'], check=True)
+          shutil.rmtree(iconset)
+          print('Created app_icon.icns')
+          "
 
       - name: Build with PyInstaller
         run: python -m PyInstaller --clean --noconfirm RiffPilot_mac.spec
