@@ -269,6 +269,83 @@
             line-height: 1.5;
         }
 
+        /* ── Install Instructions ── */
+        .install-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .install-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 2rem;
+            text-align: left;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .install-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .install-panel h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .install-panel .install-platform {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.75rem;
+        }
+
+        .install-panel ol {
+            padding-left: 1.25rem;
+            margin: 0;
+        }
+
+        .install-panel li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+            line-height: 1.5;
+        }
+
+        .install-panel li:last-child {
+            margin-bottom: 0;
+        }
+
+        .install-panel strong {
+            color: var(--text);
+        }
+
+        .install-note {
+            margin-top: 1.25rem;
+            padding: 0.75rem 1rem;
+            background: rgba(124, 58, 237, 0.08);
+            border-left: 3px solid var(--purple);
+            border-radius: 0 8px 8px 0;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .install-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* ── CTA Section ── */
         .cta {
             text-align: center;
@@ -428,6 +505,45 @@
         </div>
     </section>
 
+    <!-- Install Instructions -->
+    <section id="install">
+        <div class="container">
+            <p class="section-label">Getting started</p>
+            <h2 class="section-title">Installation guide</h2>
+            <div class="install-grid">
+                <div class="install-panel">
+                    <p class="install-platform">Windows</p>
+                    <h3>Installing on Windows</h3>
+                    <ol>
+                        <li>Download <strong>RiffPilot_Setup_1.0.0.exe</strong> above</li>
+                        <li>Double-click the installer to run it</li>
+                        <li>If Windows SmartScreen appears, click <strong>&ldquo;More info&rdquo;</strong></li>
+                        <li>Then click <strong>&ldquo;Run anyway&rdquo;</strong></li>
+                        <li>Follow the setup wizard and launch Riff Pilot</li>
+                    </ol>
+                    <div class="install-note">
+                        The SmartScreen warning appears because the app is new and not yet signed with a paid certificate. It is safe to install.
+                    </div>
+                </div>
+                <div class="install-panel">
+                    <p class="install-platform">macOS</p>
+                    <h3>Installing on Mac</h3>
+                    <ol>
+                        <li>Download <strong>RiffPilot_1.0.0_macOS.dmg</strong> above</li>
+                        <li>Open the DMG and drag <strong>Riff Pilot</strong> into <strong>Applications</strong></li>
+                        <li>Open Riff Pilot from Applications &mdash; a warning will appear</li>
+                        <li>Open <strong>System Settings &rarr; Privacy &amp; Security</strong></li>
+                        <li>Scroll down and click <strong>&ldquo;Open Anyway&rdquo;</strong> next to the Riff Pilot message</li>
+                        <li>Click <strong>&ldquo;Open&rdquo;</strong> in the confirmation dialog</li>
+                    </ol>
+                    <div class="install-note">
+                        macOS Gatekeeper blocks apps from unidentified developers. You only need to do this once &mdash; it will open normally after that.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- CTA -->
     <section class="cta">
         <h2>Ready to jam?</h2>
@@ -465,7 +581,7 @@
             });
         }, { threshold: 0.15 });
 
-        document.querySelectorAll('.card').forEach(card => observer.observe(card));
+        document.querySelectorAll('.card, .install-panel').forEach(card => observer.observe(card));
 
         // Hide scroll hint after scrolling
         window.addEventListener('scroll', () => {
