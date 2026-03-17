@@ -44,6 +44,7 @@ hiddenimports = (
 datas = (
     collect_data_files('librosa') +
     collect_data_files('demucs') +
+    collect_data_files('yt_dlp') +
     [
         ('Logo.png', '.'),
     ]
