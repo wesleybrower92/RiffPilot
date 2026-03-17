@@ -23,6 +23,14 @@ jobs:
           pip install pyinstaller Pillow
           pip install -r requirements.txt
 
+      - name: Download FFmpeg for bundling
+        run: |
+          # Download FFmpeg static build for macOS
+          curl -L "https://evermeet.cx/ffmpeg/getrelease/ffmpeg/zip" -o ffmpeg.zip
+          unzip ffmpeg.zip
+          chmod +x ffmpeg
+          echo "FFmpeg downloaded and ready for bundling"
+
       - name: Convert icon to icns
         run: |
           python3 -c "

@@ -12,6 +12,9 @@ from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.parse import quote_plus
 from urllib.error import URLError
+import shutil
+
+import yt_dlp
 
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -31,6 +34,22 @@ def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.dirname(os.path.abspath(__file__)), relative_path)
+def get_ffmpeg_path():
+    """Get path to ffmpeg, checking bundled location first, then system PATH."""
+    # Check if bundled (PyInstaller)
+    if hasattr(sys, "_MEIPASS"):
+        if sys.platform == "darwin":
+            bundled = os.path.join(sys._MEIPASS, "ffmpeg")
+        else:
+            bundled = os.path.join(sys._MEIPASS, "ffmpeg.exe")
+        if os.path.exists(bundled):
+            return bundled
+    # Fall back to system PATH
+    ffmpeg_name = "ffmpeg.exe" if sys.platform == "win32" else "ffmpeg"
+    system_ffmpeg = shutil.which(ffmpeg_name)
+    if system_ffmpeg:
+        return system_ffmpeg
+    return "ffmpeg"  # Hope it is in PATH
 
 
 # ─── Signal bridge for thread-safe UI updates ───────────────────────────────
@@ -1511,7 +1530,7 @@ class MainWindow(QMainWindow):
                 out_path = os.path.join(out_dir, f"{stem}_{counter}.{info['ext']}")
                 counter += 1
 
-            cmd = ["ffmpeg", "-y", "-i", file_path]
+            cmd = [get_ffmpeg_path(), "-y", "-i", file_path]
 
             # Codec
             cmd.extend(["-c:a", info["codec"]])
@@ -4559,50 +4578,60 @@ class MainWindow(QMainWindow):
         t.start()
 
     def _run_download(self, url, out_dir, fmt, signals):
+        """Download audio from URL using yt-dlp Python API."""
         try:
             os.makedirs(out_dir, exist_ok=True)
             output_template = os.path.join(out_dir, "%(title)s.%(ext)s")
 
-            cmd = [
-                sys.executable, "-m", "yt_dlp",
-                "-x", "--audio-format", fmt,
-                "-o", output_template,
-                "--no-playlist",
-                "--newline",
-                url
-            ]
-
-            signals.log.emit(f"Starting download...")
+            signals.log.emit("Starting download...")
             signals.log.emit(f"Format: {fmt.upper()}")
 
-            process = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, encoding="utf-8", errors="replace",
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-            )
-
             output_file = None
-            for line in process.stdout:
-                line = line.strip()
-                if not line:
-                    continue
-                # Try to find the output filename
-                if "[ExtractAudio] Destination:" in line:
-                    output_file = line.split("Destination:")[-1].strip()
-                # Show relevant lines
-                if any(k in line for k in ["[download]", "[ExtractAudio]", "Destination", "100%"]):
-                    signals.log.emit(line)
 
-            process.wait()
-            if process.returncode == 0:
-                signals.log.emit(f"\nDone! Saved to: {out_dir}")
-                signals.finished.emit(True, output_file or "")
-            else:
-                signals.log.emit(f"\nDownload failed (exit code {process.returncode})")
-                signals.finished.emit(False, "")
+            def progress_hook(d):
+                if d['status'] == 'downloading':
+                    pct = d.get('_percent_str', '')
+                    speed = d.get('_speed_str', '')
+                    if pct:
+                        signals.log.emit(f"[download] {pct} at {speed}")
+                elif d['status'] == 'finished':
+                    signals.log.emit("[download] Download complete, converting...")
+
+            def postprocessor_hook(d):
+                nonlocal output_file
+                if d['status'] == 'finished':
+                    info = d.get('info_dict', {})
+                    output_file = info.get('filepath', '')
+                    if output_file:
+                        signals.log.emit(f"[ExtractAudio] Destination: {output_file}")
+
+            ydl_opts = {
+                'format': 'bestaudio/best',
+                'outtmpl': output_template,
+                'noplaylist': True,
+                'extractaudio': True,
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': fmt,
+                    'preferredquality': '192',
+                }],
+                'ffmpeg_location': get_ffmpeg_path(),
+                'progress_hooks': [progress_hook],
+                'postprocessor_hooks': [postprocessor_hook],
+                'quiet': True,
+                'no_warnings': True,
+            }
+
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url])
+
+            signals.log.emit("")
+            signals.log.emit(f"Done! Saved to: {out_dir}")
+            signals.finished.emit(True, output_file or "")
 
         except Exception as e:
-            signals.log.emit(f"\nError: {e}")
+            signals.log.emit("")
+            signals.log.emit(f"Error: {e}")
             signals.finished.emit(False, "")
 
     def _on_download_done(self, success, output_path):
@@ -4661,51 +4690,44 @@ class MainWindow(QMainWindow):
         t.start()
 
     def _run_separation(self, file_path, out_dir, model, stems_choice, signals):
+        """Separate audio stems using demucs Python API."""
         try:
+            import demucs.separate
             os.makedirs(out_dir, exist_ok=True)
 
-            cmd = [
-                sys.executable, "-m", "demucs",
+            signals.log.emit(f"Model: {model}")
+            signals.log.emit(f"Processing: {os.path.basename(file_path)}")
+            signals.log.emit("This may take a few minutes...")
+            signals.log.emit("")
+
+            # Build command-line style args for demucs.separate.main()
+            args = [
                 "-n", model,
                 "-o", out_dir,
             ]
 
             # Handle stem selection
             if stems_choice == 1:  # Vocals only
-                cmd.extend(["--two-stems", "vocals"])
+                args.extend(["--two-stems", "vocals"])
             elif stems_choice == 2:  # Instrumental only
-                cmd.extend(["--two-stems", "vocals"])
+                args.extend(["--two-stems", "vocals"])
 
-            cmd.append(file_path)
+            args.append(file_path)
 
-            signals.log.emit(f"Model: {model}")
-            signals.log.emit(f"Processing: {os.path.basename(file_path)}")
-            signals.log.emit("This may take a few minutes...\n")
+            # Run demucs separation
+            demucs.separate.main(args)
 
-            process = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, encoding="utf-8", errors="replace",
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
-            )
-
-            for line in process.stdout:
-                line = line.strip()
-                if line:
-                    signals.log.emit(line)
-
-            process.wait()
-            if process.returncode == 0:
-                # Find the output
-                song_name = Path(file_path).stem
-                stem_dir = os.path.join(out_dir, model, song_name)
-                signals.log.emit(f"\nDone! Stems saved to:\n{stem_dir}")
-                signals.finished.emit(True, stem_dir)
-            else:
-                signals.log.emit(f"\nSeparation failed (exit code {process.returncode})")
-                signals.finished.emit(False, "")
+            # Find the output
+            song_name = Path(file_path).stem
+            stem_dir = os.path.join(out_dir, model, song_name)
+            signals.log.emit("")
+            signals.log.emit(f"Done! Stems saved to:")
+            signals.log.emit(stem_dir)
+            signals.finished.emit(True, stem_dir)
 
         except Exception as e:
-            signals.log.emit(f"\nError: {e}")
+            signals.log.emit("")
+            signals.log.emit(f"Error: {e}")
             signals.finished.emit(False, "")
 
     def _on_separation_done(self, success, msg):

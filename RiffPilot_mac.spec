@@ -6,9 +6,15 @@ Must be run on a Mac.
 """
 
 import sys
+import os
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 block_cipher = None
+
+# Check if FFmpeg binary exists for bundling
+ffmpeg_binary = []
+if os.path.exists('ffmpeg'):
+    ffmpeg_binary = [('ffmpeg', '.')]
 
 # Only collect submodules we actually need — avoid pulling in test suites
 hiddenimports = (
@@ -46,7 +52,7 @@ datas = (
 a = Analysis(
     ['app.py'],
     pathex=[],
-    binaries=[],
+    binaries=ffmpeg_binary,
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],
