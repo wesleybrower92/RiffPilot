@@ -345,6 +345,7 @@
                 grid-template-columns: 1fr;
             }
         }
+/* ── Screenshots Gallery ── */        .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem; }        .screenshot-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; opacity: 0; transform: translateY(20px); }        .screenshot-card.visible { opacity: 1; transform: translateY(0); transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, opacity 0.5s ease-out, transform 0.5s ease-out; }        .screenshot-card:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2); }        .screenshot-card img { width: 100%; height: auto; display: block; cursor: pointer; transition: opacity 0.2s; }        .screenshot-card img:hover { opacity: 0.9; }        .screenshot-info { padding: 1rem 1.25rem; }        .screenshot-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }        .screenshot-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; cursor: zoom-out; }        .lightbox.active { opacity: 1; visibility: visible; }        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }        .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 2rem; color: #fff; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }        .lightbox-close:hover { opacity: 1; }        @media (max-width: 768px) { .screenshots-grid { grid-template-columns: 1fr; max-width: 400px; margin: 2rem auto 0; } }
 
         /* ── CTA Section ── */
         .cta {
@@ -421,6 +422,7 @@
         <div class="scroll-hint">&darr;</div>
     </section>
 
+<!-- Screenshots -->    <section id="screenshots">        <div class="container">            <p class="section-label">See it in action</p>            <h2 class="section-title">Feature highlights</h2>            <div class="screenshots-grid">                <div class="screenshot-card"><img src="images/App Home Screen.png" alt="Home Screen" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Home Screen</h3><p>All 11 tools organized in one clean interface</p></div></div>                <div class="screenshot-card"><img src="images/Practice Player.png" alt="Practice Player" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Practice Player</h3><p>Slow down any track while preserving pitch</p></div></div>                <div class="screenshot-card"><img src="images/Stem Splitter.png" alt="Stem Splitter" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>AI Stem Splitter</h3><p>Separate vocals, drums, bass, and instruments</p></div></div>                <div class="screenshot-card"><img src="images/Notes %26 Scale - Pentatonic Scale Example.png" alt="Notes and Scales" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Notes &amp; Scales</h3><p>Interactive fretboard with scale patterns</p></div></div>                <div class="screenshot-card"><img src="images/Chord Library.png" alt="Chord Library" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Chord Library</h3><p>Every voicing for any chord with audio preview</p></div></div>                <div class="screenshot-card"><img src="images/Guitar Tabs.png" alt="Guitar Tabs" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Guitar Tabs</h3><p>Search and browse guitar tabs online</p></div></div>                <div class="screenshot-card"><img src="images/Key %26 BPM.png" alt="Key and BPM" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Key &amp; BPM Detection</h3><p>Analyze audio for key, tempo, and Camelot code</p></div></div>                <div class="screenshot-card"><img src="images/Guitar Tuner.png" alt="Guitar Tuner" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>Guitar Tuner</h3><p>Real-time pitch detection for accurate tuning</p></div></div>                <div class="screenshot-card"><img src="images/CAGED Chords.png" alt="CAGED Chords" onclick="openLightbox(this.src)"><div class="screenshot-info"><h3>CAGED Chords</h3><p>All five CAGED voicings for any chord</p></div></div>            </div>        </div>    </section>
     <!-- Features -->
     <section id="features">
         <div class="container">
@@ -568,6 +570,7 @@
         <p>Built with passion for musicians &middot; <a href="https://github.com/wesleybrower92/RiffPilot">GitHub</a></p>
         <p style="margin-top: 0.5rem;">&copy; 2026 GAB Consultancy. All rights reserved.</p>
     </footer>
+<!-- Lightbox -->    <div class="lightbox" id="lightbox" onclick="closeLightbox()">        <span class="lightbox-close">&times;</span>        <img src="" alt="Screenshot preview" id="lightbox-img">    </div>
 
     <script>
         // Fade-in cards on scroll
@@ -581,13 +584,14 @@
             });
         }, { threshold: 0.15 });
 
-        document.querySelectorAll('.card, .install-panel').forEach(card => observer.observe(card));
+        document.querySelectorAll('.card, .install-panel, .screenshot-card').forEach(card => observer.observe(card));
 
         // Hide scroll hint after scrolling
         window.addEventListener('scroll', () => {
             const hint = document.querySelector('.scroll-hint');
             if (hint && window.scrollY > 100) hint.style.opacity = '0';
         }, { passive: true });
+// Lightbox functions        function openLightbox(src) {            const lightbox = document.getElementById('lightbox');            const img = document.getElementById('lightbox-img');            img.src = src;            lightbox.classList.add('active');            document.body.style.overflow = 'hidden';        }        function closeLightbox() {            const lightbox = document.getElementById('lightbox');            lightbox.classList.remove('active');            document.body.style.overflow = '';        }        document.addEventListener('keydown', (e) => {            if (e.key === 'Escape') closeLightbox();        });
     </script>
 </body>
 </html>
