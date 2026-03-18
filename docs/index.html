@@ -594,7 +594,11 @@
         <p>Built with passion for musicians &middot; <a href="https://github.com/wesleybrower92/RiffPilot">GitHub</a> &middot; <a href="https://buymeacoffee.com/griportoken">Support Development</a></p>
         <p style="margin-top: 0.5rem;">&copy; 2026 GAB Consultancy. All rights reserved.</p>
     </footer>
-<!-- Lightbox -->    <div class="lightbox" id="lightbox" onclick="closeLightbox()">        <span class="lightbox-close">&times;</span>        <img src="" alt="Screenshot preview" id="lightbox-img">    </div>
+<!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img src="" alt="Screenshot preview" id="lightbox-img">
+    </div>
 
     <script>
         // Fade-in cards on scroll
@@ -615,7 +619,24 @@
             const hint = document.querySelector('.scroll-hint');
             if (hint && window.scrollY > 100) hint.style.opacity = '0';
         }, { passive: true });
-// Lightbox functions        function openLightbox(src) {            const lightbox = document.getElementById('lightbox');            const img = document.getElementById('lightbox-img');            img.src = src;            lightbox.classList.add('active');            document.body.style.overflow = 'hidden';        }        function closeLightbox() {            const lightbox = document.getElementById('lightbox');            lightbox.classList.remove('active');            document.body.style.overflow = '';        }        document.addEventListener('keydown', (e) => {            if (e.key === 'Escape') closeLightbox();        });
+// Lightbox functions
+        function openLightbox(src) {
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            img.src = src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
     </script>
 </body>
 </html>
