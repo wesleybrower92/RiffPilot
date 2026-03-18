@@ -157,6 +157,26 @@
             color: var(--text-muted);
         }
 
+        .btn-coffee {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+            padding: 0.6rem 1.2rem;
+            background: #FFDD00;
+            color: #000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-coffee:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255, 221, 0, 0.4);
+        }
+
         .scroll-hint {
             position: absolute;
             bottom: 2rem;
@@ -418,7 +438,11 @@
                 Download for Mac
             </a>
         </div>
-        <p class="hero-meta">Free &middot; Windows 10/11 &middot; macOS 10.15+ &middot; <a href="#install" style="color: var(--purple);">Installation guide</a> &middot; <a href="https://buymeacoffee.com/griportoken" style="color: var(--purple);">Support Development</a></p>
+        <p class="hero-meta">Free &middot; Windows 10/11 &middot; macOS 10.15+ &middot; <a href="#install" style="color: var(--purple);">Installation guide</a></p>
+        <a href="https://buymeacoffee.com/griportoken" class="btn-coffee" target="_blank">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20 3H4v10a4 4 0 0 0 4 4h6a4 4 0 0 0 4-4v-3h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 5h-2V5h2v3zM6 19h12v2H6z"/></svg>
+            Buy me a coffee
+        </a>
         <div class="scroll-hint">&darr;</div>
     </section>
 
