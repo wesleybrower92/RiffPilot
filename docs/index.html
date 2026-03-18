@@ -365,7 +365,7 @@
                 grid-template-columns: 1fr;
             }
         }
-/* ── Screenshots Gallery ── */        .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem; }        .screenshot-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; opacity: 0; transform: translateY(20px); }        .screenshot-card.visible { opacity: 1; transform: translateY(0); transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, opacity 0.5s ease-out, transform 0.5s ease-out; }        .screenshot-card:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2); }        .screenshot-card img { width: 100%; height: auto; display: block; cursor: pointer; transition: opacity 0.2s; }        .screenshot-card img:hover { opacity: 0.9; }        .screenshot-info { padding: 1rem 1.25rem; }        .screenshot-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }        .screenshot-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; cursor: zoom-out; }        .lightbox.active { opacity: 1; visibility: visible; }        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }        .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 2rem; color: #fff; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }        .lightbox-close:hover { opacity: 1; }        @media (max-width: 768px) { .screenshots-grid { grid-template-columns: 1fr; max-width: 400px; margin: 2rem auto 0; } }
+/* ── Screenshots Gallery ── */        .screenshots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem; }        .screenshot-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s; opacity: 0; transform: translateY(20px); }        .screenshot-card.visible { opacity: 1; transform: translateY(0); transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s, opacity 0.5s ease-out, transform 0.5s ease-out; }        .screenshot-card:hover { border-color: var(--purple); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(124, 58, 237, 0.2); }        .screenshot-card img { width: 100%; height: auto; display: block; cursor: pointer; transition: opacity 0.2s; }        .screenshot-card img:hover { opacity: 0.9; }        .screenshot-info { padding: 1rem 1.25rem; }        .screenshot-info h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }        .screenshot-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }        .lightbox { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; cursor: zoom-out; }        .lightbox.active { opacity: 1; visibility: visible; }        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }        .lightbox-close { position: absolute; top: 1.5rem; right: 1.5rem; font-size: 2rem; color: #fff; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; }        .lightbox-close:hover { opacity: 1; }        .lightbox-arrow { position: absolute; top: 50%; transform: translateY(-50%); font-size: 3rem; color: #fff; cursor: pointer; opacity: 0.7; transition: opacity 0.2s; padding: 1rem; user-select: none; }        .lightbox-arrow:hover { opacity: 1; }        .lightbox-prev { left: 1.5rem; }        .lightbox-next { right: 1.5rem; }        @media (max-width: 768px) { .screenshots-grid { grid-template-columns: 1fr; max-width: 400px; margin: 2rem auto 0; } .lightbox-arrow { font-size: 2rem; } }
 
         /* ── CTA Section ── */
         .cta {
@@ -595,9 +595,11 @@
         <p style="margin-top: 0.5rem;">&copy; 2026 GAB Consultancy. All rights reserved.</p>
     </footer>
 <!-- Lightbox -->
-    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
         <span class="lightbox-close">&times;</span>
-        <img src="" alt="Screenshot preview" id="lightbox-img">
+        <span class="lightbox-arrow lightbox-prev" onclick="changeImage(-1)">&lsaquo;</span>
+        <img src="" alt="Screenshot preview" id="lightbox-img" onclick="event.stopPropagation()">
+        <span class="lightbox-arrow lightbox-next" onclick="changeImage(1)">&rsaquo;</span>
     </div>
 
     <script>
@@ -620,22 +622,39 @@
             if (hint && window.scrollY > 100) hint.style.opacity = '0';
         }, { passive: true });
 // Lightbox functions
+        const images = Array.from(document.querySelectorAll('.screenshot-card img')).map(img => img.src);
+        let currentIndex = 0;
+
         function openLightbox(src) {
             const lightbox = document.getElementById('lightbox');
             const img = document.getElementById('lightbox-img');
+            currentIndex = images.indexOf(src);
             img.src = src;
             lightbox.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeLightbox() {
+        function closeLightbox(event) {
+            if (event && event.target.classList.contains('lightbox-arrow')) return;
             const lightbox = document.getElementById('lightbox');
             lightbox.classList.remove('active');
             document.body.style.overflow = '';
         }
 
+        function changeImage(direction) {
+            event.stopPropagation();
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = images.length - 1;
+            if (currentIndex >= images.length) currentIndex = 0;
+            document.getElementById('lightbox-img').src = images[currentIndex];
+        }
+
         document.addEventListener('keydown', (e) => {
+            const lightbox = document.getElementById('lightbox');
+            if (!lightbox.classList.contains('active')) return;
             if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') changeImage(-1);
+            if (e.key === 'ArrowRight') changeImage(1);
         });
     </script>
 </body>
