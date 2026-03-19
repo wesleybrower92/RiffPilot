@@ -550,6 +550,18 @@
                     <div class="install-note">
                         The SmartScreen warning appears because the app is new and not yet signed with a paid certificate. It is safe to install.
                     </div>
+                    <div class="install-note" style="margin-top: 0.75rem;">
+                        <strong>Windows 11 Smart App Control:</strong> If the app is blocked with no &ldquo;Run anyway&rdquo; option, you need to add an exclusion:
+                        <ol style="margin: 0.5rem 0 0 1rem; padding: 0; font-size: 0.8rem;">
+                            <li style="margin-bottom: 0.3rem;">Open the <strong>Start menu</strong> and search for <strong>&ldquo;Windows Security&rdquo;</strong></li>
+                            <li style="margin-bottom: 0.3rem;">Click <strong>&ldquo;Virus &amp; threat protection&rdquo;</strong></li>
+                            <li style="margin-bottom: 0.3rem;">Scroll down and click <strong>&ldquo;Manage settings&rdquo;</strong> under Virus &amp; threat protection settings</li>
+                            <li style="margin-bottom: 0.3rem;">Scroll down and click <strong>&ldquo;Add or remove exclusions&rdquo;</strong> under Exclusions</li>
+                            <li style="margin-bottom: 0.3rem;">Click <strong>&ldquo;Add an exclusion&rdquo;</strong> &rarr; choose <strong>&ldquo;Folder&rdquo;</strong></li>
+                            <li style="margin-bottom: 0.3rem;">Navigate to <code style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; border-radius: 3px;">C:\Program Files\RiffPilot</code> and select it</li>
+                            <li style="margin-bottom: 0;">Run the installer again &mdash; it should now work</li>
+                        </ol>
+                    </div>
                 </div>
                 <div class="install-panel">
                     <p class="install-platform">macOS</p>
