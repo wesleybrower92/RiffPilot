@@ -4693,6 +4693,7 @@ class MainWindow(QMainWindow):
         """Separate audio stems using demucs Python API."""
         try:
             import demucs.separate
+            import io
             os.makedirs(out_dir, exist_ok=True)
 
             signals.log.emit(f"Model: {model}")
@@ -4714,8 +4715,18 @@ class MainWindow(QMainWindow):
 
             args.append(file_path)
 
-            # Run demucs separation
-            demucs.separate.main(args)
+            # Redirect stdout/stderr for packaged app (PyInstaller --windowed sets them to None)
+            old_stdout, old_stderr = sys.stdout, sys.stderr
+            if sys.stdout is None:
+                sys.stdout = io.StringIO()
+            if sys.stderr is None:
+                sys.stderr = io.StringIO()
+
+            try:
+                # Run demucs separation
+                demucs.separate.main(args)
+            finally:
+                sys.stdout, sys.stderr = old_stdout, old_stderr
 
             # Find the output
             song_name = Path(file_path).stem
